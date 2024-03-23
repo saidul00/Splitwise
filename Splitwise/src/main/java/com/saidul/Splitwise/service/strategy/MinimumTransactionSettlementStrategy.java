@@ -33,6 +33,7 @@ public class MinimumTransactionSettlementStrategy implements SettleUpStrategy{
             UserAmount borrower = minHeap.poll();
             UserAmount lender = maxHeap.poll();
 
+            assert lender != null;
             if(Math.abs(borrower.getAmount()) > lender.getAmount()){
                 borrower.setAmount(borrower.getAmount() + lender.getAmount());
                 minHeap.add(borrower);

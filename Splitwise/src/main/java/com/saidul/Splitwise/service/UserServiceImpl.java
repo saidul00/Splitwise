@@ -1,13 +1,14 @@
 package com.saidul.Splitwise.service;
 
-import com.saidul.Splitwise.Exception.InvalidEmailException;
-import com.saidul.Splitwise.Exception.InvalidPasswordException;
-import com.saidul.Splitwise.Exception.RegistrationException;
+import com.saidul.Splitwise.Exception.*;
 import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -38,6 +39,38 @@ public class UserServiceImpl implements UserService{
             return savedUser;
         }else {
             throw new InvalidPasswordException("Incorrect password");
+        }
+    }
+
+    @Override
+    public User addFriend(int id, String email) {
+        User userAddingFriend = userRepository.findUserById(id);
+        User userBeingAddedAsFriend = userRepository.findUserByEmail(email);
+        if(userAddingFriend == null){
+            throw new InvalidUserIdException("Id for user adding friend does not exist");
+        } else if (userBeingAddedAsFriend == null) {
+            throw new InvalidEmailException("Email for userBeingAddedAsFriend does not exist");
+        }
+        List<User> friendListOfUserAdding = new ArrayList<>();
+        if(userAddingFriend.getFriends() != null){
+            friendListOfUserAdding = userAddingFriend.getFriends();
+        }
+        List<User> userBeingAddedAsFriendList = new ArrayList<>();
+        if(userBeingAddedAsFriend.getFriends() != null){
+            userBeingAddedAsFriendList = userBeingAddedAsFriend.getFriends();
+        }
+        validateAdd(userBeingAddedAsFriend, friendListOfUserAdding);
+        validateAdd(userAddingFriend, userBeingAddedAsFriendList);
+        userRepository.save(userAddingFriend);
+        userRepository.save(userBeingAddedAsFriend);
+        return userAddingFriend;
+    }
+
+    private void validateAdd(User newFriend, List<User> friendList){
+        if(friendList.contains(newFriend)){
+            throw new InvalidFriendRequestException("Adding the same friend multiple times is not allowed.");
+        }else {
+            friendList.add(newFriend);
         }
     }
 }

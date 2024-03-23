@@ -1,7 +1,9 @@
 package com.saidul.Splitwise.controller;
 
+import com.saidul.Splitwise.Exception.InvalidFriendRequestData;
 import com.saidul.Splitwise.Exception.UserLoginInvalidDataException;
 import com.saidul.Splitwise.Exception.UserRegistrationInvalidDataException;
+import com.saidul.Splitwise.dto.UserAddFriendRequestDTO;
 import com.saidul.Splitwise.dto.UserLoginRequestDTO;
 import com.saidul.Splitwise.dto.UserSignUpRequestDTO;
 import com.saidul.Splitwise.entity.User;
@@ -34,6 +36,15 @@ public class UserController {
         );
     }
 
+    @PostMapping("/addfriend")
+    public ResponseEntity addFriend(@RequestBody UserAddFriendRequestDTO friendRequestDTO){
+        validateFriendRequestDTO(friendRequestDTO);
+        User savedUser = userService.addFriend(friendRequestDTO.getUserId(), friendRequestDTO.getFriendEmail());
+        return ResponseEntity.ok(
+                EntityDTOMapper.toDTO(savedUser)
+        );
+    }
+
     private void validateUserSignUpRequestDTO(UserSignUpRequestDTO signUpRequestDTO){
         if(signUpRequestDTO.getEmail().isEmpty() || signUpRequestDTO.getName().isEmpty() || signUpRequestDTO.getPassword().isEmpty()){
             throw new UserRegistrationInvalidDataException("Invalid sign up data");
@@ -42,6 +53,11 @@ public class UserController {
     private void validateUserLoginRequestDTO(UserLoginRequestDTO userLoginRequestDTO){
         if(userLoginRequestDTO.getEmail().isEmpty() || userLoginRequestDTO.getPassword().isEmpty()){
             throw new UserLoginInvalidDataException("Invalid login credential");
+        }
+    }
+    private void validateFriendRequestDTO(UserAddFriendRequestDTO friendRequestDTO){
+        if(friendRequestDTO.getUserId()==null || friendRequestDTO.getFriendEmail().isEmpty()){
+            throw new InvalidFriendRequestData("Invalid data for friend request");
         }
     }
 
