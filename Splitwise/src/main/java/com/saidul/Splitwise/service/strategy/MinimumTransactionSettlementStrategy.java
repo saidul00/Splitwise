@@ -1,18 +1,55 @@
 package com.saidul.Splitwise.service.strategy;
 
+import com.saidul.Splitwise.dto.UserAmount;
 import com.saidul.Splitwise.entity.Expense;
 import com.saidul.Splitwise.entity.SettlementTransaction;
 import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.entity.UserExpense;
 import com.saidul.Splitwise.entity.constant.UserExpenseType;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 public class MinimumTransactionSettlementStrategy implements SettleUpStrategy{
     @Override
     public List<SettlementTransaction> getSettlementTransactions(List<Expense> expenses) {
-        return null;
+        HashMap<User,Double> outstandingBalance = getOutstandingBalances(expenses);
+        Comparator<UserAmount> maxHeapComparator = Comparator.comparingDouble(UserAmount::getAmount).reversed();
+        Comparator<UserAmount> minHeapComparator = Comparator.comparingDouble(UserAmount::getAmount);
+        PriorityQueue<UserAmount> maxHeap = new PriorityQueue<>(maxHeapComparator);
+        PriorityQueue<UserAmount> minHeap = new PriorityQueue<>(minHeapComparator);
+
+        for(Map.Entry<User,Double> entry : outstandingBalance.entrySet()){
+            if(entry.getValue()<0){
+                minHeap.add(new UserAmount(entry.getKey(), entry.getValue()));
+            }else if(entry.getValue() > 0){
+                maxHeap.add(new UserAmount(entry.getKey(), entry.getValue()));
+            }else{
+                System.out.println("User doesn't need to participate in settlement.");
+            }
+        }
+
+        List<SettlementTransaction> settlementTransactions = new ArrayList<>();
+        while (!maxHeap.isEmpty() && !minHeap.isEmpty()){
+            UserAmount borrower = minHeap.poll();
+            UserAmount lender = maxHeap.poll();
+
+            if(Math.abs(borrower.getAmount()) > lender.getAmount()){
+                borrower.setAmount(borrower.getAmount() + lender.getAmount());
+                minHeap.add(borrower);
+                SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), lender.getAmount());
+                settlementTransactions.add(settlementTransaction);
+            } else if (Math.abs(borrower.getAmount()) < lender.getAmount()) {
+                lender.setAmount(lender.getAmount() + borrower.getAmount());
+                maxHeap.add(lender);
+                SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), Math.abs(borrower.getAmount()));
+                settlementTransactions.add(settlementTransaction);
+            }else {
+                System.out.println(" Both Equal ");
+                SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), lender.getAmount());
+                settlementTransactions.add(settlementTransaction);
+            }
+        }
+        return settlementTransactions;
     }
     public HashMap<User, Double> getOutstandingBalances(List<Expense> expenses){
         HashMap<User, Double> outstandingBalanceMap = new HashMap<>();
