@@ -35,8 +35,8 @@ public class EntityDTOMapper {
 
     public static UserFriendResponseDTO toFriendDTO(User user){
         UserFriendResponseDTO responseDTO = new UserFriendResponseDTO();
-        responseDTO.setId(user.getId());
-        responseDTO.setName(user.getEmail());
+        responseDTO.setName(user.getName());
+        responseDTO.setEmail(user.getEmail());
         return responseDTO;
     }
     public static GroupResponseDTO toGroupDTO(Group group){

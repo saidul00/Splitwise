@@ -65,6 +65,9 @@ public class UserServiceImpl implements UserService{
         userRepository.save(userBeingAddedAsFriend);
         return userAddingFriend;
     }
+    public User getUserById(int id){
+        return userRepository.findUserById(id);
+    }
 
     private void validateAdd(User newFriend, List<User> friendList){
         if(friendList.contains(newFriend)){

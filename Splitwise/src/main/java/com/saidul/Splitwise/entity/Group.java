@@ -24,4 +24,14 @@ public class Group extends BaseModel{
     private List<Expense> expenses;
     @OneToMany
     private List<SettlementTransaction> settlementTransactions;
+
+    public Group() {
+    }
+
+    public Group(String name, User createdBy, List<User> members) {
+        this.name = name;
+        this.createdBy = createdBy;
+        this.members = members;
+        this.creationDate=LocalDateTime.now();
+    }
 }
