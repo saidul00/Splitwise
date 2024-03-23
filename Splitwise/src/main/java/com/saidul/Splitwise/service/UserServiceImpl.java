@@ -10,10 +10,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserService {
+public class UserServiceImpl implements UserService{
     @Autowired
     private UserRepository userRepository;
-
+    @Override
     public User signUp(String name, String email, String password){
         User savedUser = userRepository.findUserByEmail(email);
         if(savedUser != null){
@@ -26,7 +26,7 @@ public class UserService {
         user.setPassword(encoder.encode(password));
         return userRepository.save(user);
     }
-
+    @Override
     public User login(String email, String password){
         User savedUser = userRepository.findUserByEmail(email);
         if(savedUser == null){
@@ -36,7 +36,8 @@ public class UserService {
         encoder.encode(password);
         if(encoder.matches(password, savedUser.getPassword())){
             return savedUser;
+        }else {
+            throw new InvalidPasswordException("Incorrect password");
         }
-        throw new InvalidPasswordException("Incorrect password");
     }
 }

@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class UserLoginRequestDTO {
-    private String email;
-    private String password;
+public class GroupResponseDTO {
+    private String groupName;
+    private double amount;
 }
