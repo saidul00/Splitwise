@@ -31,7 +31,7 @@ public class UserServiceImpl implements UserService{
     public User login(String email, String password){
         User savedUser = userRepository.findUserByEmail(email);
         if(savedUser == null){
-            throw new InvalidEmailException("We could not find an account associated with given email address");
+            throw new InvalidEmailException("Email not found");
         }
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         encoder.encode(password);

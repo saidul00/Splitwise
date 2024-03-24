@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface GroupService {
     Group createGroup(String groupName, User createdBy, List<User> members);
+    Group getGroupById(int groupId);
     List<SettlementTransaction> settleUp(int groupId);
 }

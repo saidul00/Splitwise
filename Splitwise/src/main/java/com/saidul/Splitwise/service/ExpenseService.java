@@ -6,4 +6,5 @@ import java.util.Currency;
 
 public interface ExpenseService {
     Expense addExpense(String description, double amount, Currency currency, int addedBy);
+    Expense getExpenseById(int expenseId);
 }

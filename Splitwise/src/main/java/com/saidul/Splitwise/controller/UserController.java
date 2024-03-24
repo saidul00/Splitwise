@@ -1,8 +1,6 @@
 package com.saidul.Splitwise.controller;
 
-import com.saidul.Splitwise.Exception.InvalidFriendRequestData;
-import com.saidul.Splitwise.Exception.UserLoginInvalidDataException;
-import com.saidul.Splitwise.Exception.UserRegistrationInvalidDataException;
+import com.saidul.Splitwise.Exception.*;
 import com.saidul.Splitwise.dto.UserAddFriendRequestDTO;
 import com.saidul.Splitwise.dto.UserLoginRequestDTO;
 import com.saidul.Splitwise.dto.UserSignUpRequestDTO;
@@ -19,8 +17,12 @@ public class UserController {
     private UserService userService;
 
     @PostMapping("/signup")
-    public ResponseEntity signUp(@RequestBody UserSignUpRequestDTO dto) throws Exception{
-        validateUserSignUpRequestDTO(dto);
+    public ResponseEntity signUp(@RequestBody UserSignUpRequestDTO dto){
+        try {
+            validateUserSignUpRequestDTO(dto);
+        }catch (UserRegistrationInvalidDataException e){
+            return ResponseEntity.badRequest().body("Invalid sign up data");
+        }
         User savedUser = userService.signUp(dto.getName(),dto.getEmail(),dto.getPassword());
         return ResponseEntity.ok(
                 EntityDTOMapper.toDTO(savedUser)
@@ -29,20 +31,43 @@ public class UserController {
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody UserLoginRequestDTO dto) throws Exception{
-        validateUserLoginRequestDTO(dto);
-        User savedUser = userService.login(dto.getEmail(), dto.getPassword());
-        return ResponseEntity.ok(
-                EntityDTOMapper.toDTO(savedUser)
-        );
+        try {
+            validateUserLoginRequestDTO(dto);
+        }catch (UserLoginInvalidDataException e){
+            ResponseEntity.badRequest().body("Invalid login credential");
+        }
+        try {
+            User savedUser = userService.login(dto.getEmail(), dto.getPassword());
+            return ResponseEntity.ok(
+                    EntityDTOMapper.toDTO(savedUser)
+            );
+        }catch (InvalidEmailException e){
+            return ResponseEntity.badRequest().body("Email not found.");
+        }catch (InvalidPasswordException e){
+            return ResponseEntity.badRequest().body("Incorrect password");
+        }
     }
 
     @PostMapping("/addfriend")
     public ResponseEntity addFriend(@RequestBody UserAddFriendRequestDTO friendRequestDTO){
+        try {
+            validateFriendRequestDTO(friendRequestDTO);
+        }catch (InvalidFriendRequestData exception){
+            return ResponseEntity.badRequest().body("Invalid data for friend request");
+        }
+
+
         validateFriendRequestDTO(friendRequestDTO);
-        User savedUser = userService.addFriend(friendRequestDTO.getUserId(), friendRequestDTO.getFriendEmail());
-        return ResponseEntity.ok(
-                EntityDTOMapper.toDTO(savedUser)
-        );
+        try {
+            User savedUser = userService.addFriend(friendRequestDTO.getUserId(), friendRequestDTO.getFriendEmail());
+            return ResponseEntity.ok(
+                    EntityDTOMapper.toDTO(savedUser)
+            );
+        }catch (InvalidEmailException invalidEmailException){
+            return ResponseEntity.badRequest().body("User with email not found");
+        }catch (InvalidFriendRequestException friendRequestException){
+            return ResponseEntity.badRequest().body("Adding the same friend multiple times is not allowed.");
+        }
     }
 
     private void validateUserSignUpRequestDTO(UserSignUpRequestDTO signUpRequestDTO){

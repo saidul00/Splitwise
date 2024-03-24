@@ -1,4 +1,5 @@
 package com.saidul.Splitwise.controller;
+import com.saidul.Splitwise.Exception.InvalidGroupIdException;
 import com.saidul.Splitwise.Exception.InvalidGroupRequestData;
 import com.saidul.Splitwise.dto.CreateGroupRequestDTO;
 import com.saidul.Splitwise.entity.Group;
@@ -8,9 +9,7 @@ import com.saidul.Splitwise.service.GroupService;
 import com.saidul.Splitwise.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,9 +33,26 @@ public class GroupController {
                 EntityDTOMapper.toGroupDTO(group)
         );
     }
+    @GetMapping("/group/{id}")
+    public ResponseEntity getGroup(@PathVariable ("id") int groupId){
+        validateGroupReqId(groupId);
+        try {
+            Group savedGroup = groupService.getGroupById(groupId);
+            return ResponseEntity.ok(
+                    EntityDTOMapper.toGroupDTO(savedGroup)
+            );
+        }catch (InvalidGroupIdException groupIdException){
+            return ResponseEntity.badRequest().body("Group not found");
+        }
+    }
     private void validateGroupRequestDTO(CreateGroupRequestDTO groupRequestDTO){
         if(groupRequestDTO.getGroupName().isEmpty() || groupRequestDTO.getCreatedByUID()==null || groupRequestDTO.getMemberIds().isEmpty()){
             throw new InvalidGroupRequestData("Provided data is insufficient to create group");
+        }
+    }
+    private void validateGroupReqId(int id){
+        if(id < 0){
+            throw new InvalidGroupRequestData("Invalid Group data.");
         }
     }
 }
