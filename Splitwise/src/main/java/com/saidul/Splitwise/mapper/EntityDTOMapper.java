@@ -1,10 +1,10 @@
 package com.saidul.Splitwise.mapper;
 
-import com.saidul.Splitwise.dto.GroupResponseDTO;
-import com.saidul.Splitwise.dto.UserFriendResponseDTO;
-import com.saidul.Splitwise.dto.UserLoginResponseDTO;
+import com.saidul.Splitwise.dto.*;
+import com.saidul.Splitwise.entity.Expense;
 import com.saidul.Splitwise.entity.Group;
 import com.saidul.Splitwise.entity.User;
+import com.saidul.Splitwise.entity.UserExpense;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,5 +44,27 @@ public class EntityDTOMapper {
         groupResponseDTO.setGroupName(group.getName());
         groupResponseDTO.setAmount(group.getTotalAmountSpent());
         return groupResponseDTO;
+    }
+    public static ExpenseResponseDTO toExpenseDTO(Expense expense){
+        ExpenseResponseDTO expenseResponseDTO = new ExpenseResponseDTO();
+        expenseResponseDTO.setDescription(expense.getDescription());
+        expenseResponseDTO.setAmount(expense.getAmount());
+        expenseResponseDTO.setCurrency(expense.getCurrency());
+        expenseResponseDTO.setAddedBy(expense.getAddedBy().getName());
+        expenseResponseDTO.setLocalDateTime(expense.getLocalDateTime());
+        List<UserExpenseResponseDTO> members = new ArrayList<>();
+        if(expense.getUserExpenses() != null) {
+            for (UserExpense userExpense : expense.getUserExpenses()) {
+                members.add(toUserExpenseDTO(userExpense));
+            }
+        }
+        return expenseResponseDTO;
+    }
+    public static UserExpenseResponseDTO toUserExpenseDTO(UserExpense userExpense){
+        UserExpenseResponseDTO userExpenseResponseDTO = new UserExpenseResponseDTO();
+        userExpenseResponseDTO.setName(userExpense.getUser().getName());
+        userExpenseResponseDTO.setAmount(userExpense.getAmount());
+        userExpenseResponseDTO.setType(userExpense.getUserExpenseType().toString());
+        return userExpenseResponseDTO;
     }
 }

@@ -1,6 +1,9 @@
 package com.saidul.Splitwise.service;
 
+import com.saidul.Splitwise.entity.Expense;
+
+import java.util.Currency;
+
 public interface ExpenseService {
-    interface GroupService {
-    }
+    Expense addExpense(String description, double amount, Currency currency, int addedBy);
 }
