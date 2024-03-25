@@ -1,13 +1,18 @@
 package com.saidul.Splitwise.controller.test;
 
-import com.saidul.Splitwise.controller.test.bulkAPIs.AddExpenseBulkAPI;
-import com.saidul.Splitwise.controller.test.bulkAPIs.CreateGroupBulkAPI;
-import com.saidul.Splitwise.controller.test.bulkAPIs.SignUpBulkAPI;
+import com.saidul.Splitwise.controller.ExpenseController;
+import com.saidul.Splitwise.controller.GroupController;
+import com.saidul.Splitwise.controller.UserController;
+import com.saidul.Splitwise.dto.AddExpenseRequestDTO;
+import com.saidul.Splitwise.dto.CreateGroupRequestDTO;
+import com.saidul.Splitwise.dto.UserSignUpRequestDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class DataForge {
@@ -17,19 +22,34 @@ public class DataForge {
     2.group DTOs
     3.expense DTOs
      */
+
     @Autowired
-    private SignUpBulkAPI signUpBulkAPI;
+    private UserController userController;
     @Autowired
-    private CreateGroupBulkAPI createGroupBulkAPI;
+    private GroupController groupController;
     @Autowired
-    private AddExpenseBulkAPI addExpenseBulkAPI;
+    private ExpenseController expenseController;
 
     @PostMapping("/forge")
     public ResponseEntity forgeData(@RequestBody ForgeDTO forgeDTO){
-        signUpBulkAPI.batchSignUp(forgeDTO.getSignupDTOs().getSingUpDTOBatch());
-        createGroupBulkAPI.createGroupInBulk(forgeDTO.getGroupDTOs().getGroupRequestDTOList());
-        addExpenseBulkAPI.createExpenseInBulk(forgeDTO.getExpenseDTOs().getAddExpenseRequestDTOList());
+        signUp(forgeDTO.getSignUpRequestDTOS());
+        createGroup(forgeDTO.getGroupRequestDTOS());
+        createExpense(forgeDTO.getExpenseRequestDTOS());
         return ResponseEntity.ok().build();
     }
-
+    private void signUp(List<UserSignUpRequestDTO> signUpRequestDTOS){
+        for(UserSignUpRequestDTO signUpRequestDTO : signUpRequestDTOS){
+            userController.signUp(signUpRequestDTO);
+        }
+    }
+    private void createGroup(List<CreateGroupRequestDTO> groupRequestDTOS){
+        for(CreateGroupRequestDTO groupRequestDTO : groupRequestDTOS){
+            groupController.createdGroup(groupRequestDTO);
+        }
+    }
+    private void createExpense(List<AddExpenseRequestDTO> expenses) {
+        for(AddExpenseRequestDTO expense : expenses){
+            expenseController.addExpense(expense);
+        }
+    }
 }
