@@ -43,37 +43,29 @@ public class UserServiceImpl implements UserService{
     }
 
     @Override
-    public User addFriend(int id, String email) {
-        User userAddingFriend = userRepository.findUserById(id);
-        User userBeingAddedAsFriend = userRepository.findUserByEmail(email);
-        if(userAddingFriend == null){
+    public boolean addFriend(int id, String email) {
+        User user = userRepository.findUserById(id);
+        User friend = userRepository.findUserByEmail(email);
+        if(user == null){
             throw new InvalidUserIdException("Id for user adding friend does not exist");
-        } else if (userBeingAddedAsFriend == null) {
-            throw new InvalidEmailException("Email for userBeingAddedAsFriend does not exist");
+        } else if (friend == null) {
+            throw new InvalidEmailException("Email for friend does not exist");
         }
-        List<User> friendListOfUserAdding = new ArrayList<>();
-        if(userAddingFriend.getFriends() != null){
-            friendListOfUserAdding = userAddingFriend.getFriends();
+        if (user.getFriends() != null && user.getFriends().contains(friend)) {
+            throw new InvalidFriendRequestException("Friend already exists in user's friend list");
         }
-        List<User> userBeingAddedAsFriendList = new ArrayList<>();
-        if(userBeingAddedAsFriend.getFriends() != null){
-            userBeingAddedAsFriendList = userBeingAddedAsFriend.getFriends();
+        if (user.getFriends() != null){
+            user.getFriends().add(friend);
+            userRepository.save(user);
         }
-        validateAdd(userBeingAddedAsFriend, friendListOfUserAdding);
-        validateAdd(userAddingFriend, userBeingAddedAsFriendList);
-        userRepository.save(userAddingFriend);
-        userRepository.save(userBeingAddedAsFriend);
-        return userAddingFriend;
+        if(friend.getFriends() != null){
+            friend.getFriends().add(user);
+            userRepository.save(friend);
+        }
+        return true;
     }
     public User getUserById(int id){
         return userRepository.findUserById(id);
     }
 
-    private void validateAdd(User newFriend, List<User> friendList){
-        if(friendList.contains(newFriend)){
-            throw new InvalidFriendRequestException("Adding the same friend multiple times is not allowed.");
-        }else {
-            friendList.add(newFriend);
-        }
-    }
 }

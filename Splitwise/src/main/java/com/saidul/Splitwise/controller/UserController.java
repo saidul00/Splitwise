@@ -1,7 +1,7 @@
 package com.saidul.Splitwise.controller;
 
 import com.saidul.Splitwise.Exception.*;
-import com.saidul.Splitwise.dto.UserAddFriendRequestDTO;
+import com.saidul.Splitwise.dto.AddFriendRequestDTO;
 import com.saidul.Splitwise.dto.UserLoginRequestDTO;
 import com.saidul.Splitwise.dto.UserSignUpRequestDTO;
 import com.saidul.Splitwise.entity.User;
@@ -49,19 +49,16 @@ public class UserController {
     }
 
     @PostMapping("/addfriend")
-    public ResponseEntity addFriend(@RequestBody UserAddFriendRequestDTO friendRequestDTO){
+    public ResponseEntity addFriend(@RequestBody AddFriendRequestDTO dto){
         try {
-            validateFriendRequestDTO(friendRequestDTO);
+            validateFriendRequestDTO(dto);
         }catch (InvalidFriendRequestData exception){
             return ResponseEntity.badRequest().body("Invalid data for friend request");
         }
-
-
-        validateFriendRequestDTO(friendRequestDTO);
         try {
-            User savedUser = userService.addFriend(friendRequestDTO.getUserId(), friendRequestDTO.getFriendEmail());
+            boolean savedUser = userService.addFriend(dto.getUserId(), dto.getFriendEmail());
             return ResponseEntity.ok(
-                    EntityDTOMapper.toDTO(savedUser)
+                    savedUser
             );
         }catch (InvalidEmailException invalidEmailException){
             return ResponseEntity.badRequest().body("User with email not found");
@@ -80,7 +77,7 @@ public class UserController {
             throw new UserLoginInvalidDataException("Invalid login credential");
         }
     }
-    private void validateFriendRequestDTO(UserAddFriendRequestDTO friendRequestDTO){
+    private void validateFriendRequestDTO(AddFriendRequestDTO friendRequestDTO){
         if(friendRequestDTO.getUserId()==null || friendRequestDTO.getFriendEmail().isEmpty()){
             throw new InvalidFriendRequestData("Invalid data for friend request");
         }

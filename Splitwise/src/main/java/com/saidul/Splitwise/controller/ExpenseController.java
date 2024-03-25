@@ -24,8 +24,6 @@ public class ExpenseController {
                 EntityDTOMapper.toExpenseDTO(savedExpense)
         );
     }
-
-    @PostMapping("")
     @GetMapping("/expense/{id}")
     public ResponseEntity getExpense(@PathVariable ("id") int expenseId){
         validateExpenseId(expenseId);
