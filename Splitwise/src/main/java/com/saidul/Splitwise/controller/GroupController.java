@@ -18,19 +18,17 @@ import java.util.List;
 public class GroupController {
     @Autowired
     private GroupService groupService;
-    @Autowired
-    private UserService userService;
     @PostMapping("/creategroup")
     public ResponseEntity createdGroup(@RequestBody CreateGroupRequestDTO groupRequestDTO){
-        validateGroupRequestDTO(groupRequestDTO);
-        User user = userService.getUserById(groupRequestDTO.getCreatedByUID());
-        List<User> userList = new ArrayList<>();
-        for (Integer member : groupRequestDTO.getMemberIds()){
-            userList.add(userService.getUserById(member));
+        try{
+            validateGroupRequestDTO(groupRequestDTO);
+        }catch (InvalidGroupRequestData invalidGroupRequestData){
+            return ResponseEntity.badRequest().body("Provided data is insufficient to create group");
         }
-        Group group = groupService.createGroup(groupRequestDTO.getGroupName(), user, userList);
+        Group savedGroup = groupService.createGroup(groupRequestDTO.getGroupName(),
+                groupRequestDTO.getAdminUID(), groupRequestDTO.getMemberIds());
         return ResponseEntity.ok(
-                EntityDTOMapper.toGroupDTO(group)
+                EntityDTOMapper.toGroupDTO(savedGroup)
         );
     }
     @GetMapping("/group/{id}")
@@ -46,7 +44,7 @@ public class GroupController {
         }
     }
     private void validateGroupRequestDTO(CreateGroupRequestDTO groupRequestDTO){
-        if(groupRequestDTO.getGroupName().isEmpty() || groupRequestDTO.getCreatedByUID()==null || groupRequestDTO.getMemberIds().isEmpty()){
+        if(groupRequestDTO.getGroupName().isEmpty() || groupRequestDTO.getAdminUID()==null || groupRequestDTO.getMemberIds().isEmpty()){
             throw new InvalidGroupRequestData("Provided data is insufficient to create group");
         }
     }

@@ -17,5 +17,7 @@ public class User extends BaseModel{
     @ManyToMany
     private List<User> friends;
     @ManyToMany
+    // TODO members will be added by only the admin aka the group creator, subsequently group members profile will show the
+    //list of groups they are part of
     private List<Group> groups;
 }

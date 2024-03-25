@@ -15,23 +15,14 @@ import java.util.List;
 public class Group extends BaseModel{
     private String name;
     @ManyToOne
-    private User createdBy;
+    private User admin;
     private double totalAmountSpent;
     private LocalDateTime creationDate;
     @OneToMany
+    // admin becomes group member by default;
     private List<User> members;
     @OneToMany
     private List<Expense> expenses;
     @OneToMany
     private List<SettlementTransaction> settlementTransactions;
-
-    public Group() {
-    }
-
-    public Group(String name, User createdBy, List<User> members) {
-        this.name = name;
-        this.createdBy = createdBy;
-        this.members = members;
-        this.creationDate=LocalDateTime.now();
-    }
 }

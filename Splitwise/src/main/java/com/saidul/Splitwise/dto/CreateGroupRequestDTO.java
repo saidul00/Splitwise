@@ -9,6 +9,6 @@ import java.util.List;
 @Setter
 public class CreateGroupRequestDTO {
     private String groupName;
-    private Integer createdByUID;
+    private Integer adminUID;
     private List<Integer> memberIds;
 }
