@@ -2,6 +2,7 @@ package com.saidul.Splitwise.service;
 
 import com.saidul.Splitwise.Exception.InvalidExpenseIdException;
 import com.saidul.Splitwise.entity.Expense;
+import com.saidul.Splitwise.entity.Group;
 import com.saidul.Splitwise.repository.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ public class ExpenseServiceImpl implements ExpenseService{
     private ExpenseRepository expenseRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private GroupService groupService;
     @Override
     public Expense addExpense(String description,double amount,Currency currency,int addedBy){
         Expense expense = new Expense();
@@ -32,6 +35,14 @@ public class ExpenseServiceImpl implements ExpenseService{
         if(savedExpense == null) {
             throw new InvalidExpenseIdException("Given expense ID does not exist");
         }
+        return savedExpense;
+    }
+
+    @Override
+    public Expense addExpenseToGroup(int expenseId, int groupId) {
+        //validation
+        Expense savedExpense = expenseRepository.findExpenseById(expenseId);
+        groupService.addExpenseToGroup(savedExpense, groupId);
         return savedExpense;
     }
 }

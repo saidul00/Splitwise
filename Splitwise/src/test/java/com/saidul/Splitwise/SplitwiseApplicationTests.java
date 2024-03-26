@@ -1,5 +1,6 @@
 package com.saidul.Splitwise;
 
+import com.saidul.Splitwise.entity.Group;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

@@ -3,6 +3,7 @@ package com.saidul.Splitwise.controller;
 import com.saidul.Splitwise.Exception.InavlidExpenseDataException;
 import com.saidul.Splitwise.Exception.InvalidExpenseIdException;
 import com.saidul.Splitwise.dto.AddExpenseRequestDTO;
+import com.saidul.Splitwise.dto.ExpenseToGroupMappingDTO;
 import com.saidul.Splitwise.entity.Expense;
 import com.saidul.Splitwise.mapper.EntityDTOMapper;
 import com.saidul.Splitwise.service.ExpenseService;
@@ -35,6 +36,11 @@ public class ExpenseController {
         }catch (InvalidExpenseIdException expenseIdException){
             return ResponseEntity.badRequest().body("Expense not found");
         }
+    }
+    @PostMapping("/addexpensetogroup")
+    public ResponseEntity addExpenseToGroup(@RequestBody ExpenseToGroupMappingDTO expenseToGroupMappingDTO){
+        expenseService.addExpenseToGroup(expenseToGroupMappingDTO.getExpenseId(), expenseToGroupMappingDTO.getGroupId());
+        return ResponseEntity.ok("Added successfully");
     }
     private void validateExpenseRequestDTO(AddExpenseRequestDTO expenseRequestDTO){
         if(expenseRequestDTO.getDescription().isEmpty() || expenseRequestDTO.getAddedBy()==null ||
