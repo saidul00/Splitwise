@@ -37,12 +37,24 @@ public class GroupController {
         try {
             Group savedGroup = groupService.getGroupById(groupId);
             return ResponseEntity.ok(
-                    EntityDTOMapper.toGroupDTO(savedGroup)
+                   EntityDTOMapper.toGroupDTO(savedGroup)
             );
         }catch (InvalidGroupIdException groupIdException){
             return ResponseEntity.badRequest().body("Group not found");
         }
     }
+
+
+    @PostMapping("/split/{groupId}")
+    public ResponseEntity splitGroupExpenses(@PathVariable ("groupId") int groupId){
+        validateGroupReqId(groupId);
+        groupService.splitExpense(groupId);
+        return ResponseEntity.ok(
+                "done"
+        );
+    }
+
+
     private void validateGroupRequestDTO(CreateGroupRequestDTO groupRequestDTO){
         if(groupRequestDTO.getGroupName().isEmpty() || groupRequestDTO.getAdminUID()==null || groupRequestDTO.getMemberIds().isEmpty()){
             throw new InvalidGroupRequestData("Provided data is insufficient to create group");

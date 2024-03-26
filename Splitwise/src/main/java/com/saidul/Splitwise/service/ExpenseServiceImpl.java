@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Currency;
 
 @Service
@@ -32,9 +33,7 @@ public class ExpenseServiceImpl implements ExpenseService{
     @Override
     public Expense getExpenseById(int expenseId) {
         Expense savedExpense = expenseRepository.findExpenseById(expenseId);
-        if(savedExpense == null) {
-            throw new InvalidExpenseIdException("Given expense ID does not exist");
-        }
+        validExpense(savedExpense);
         return savedExpense;
     }
 
@@ -42,7 +41,17 @@ public class ExpenseServiceImpl implements ExpenseService{
     public Expense addExpenseToGroup(int expenseId, int groupId) {
         //validation
         Expense savedExpense = expenseRepository.findExpenseById(expenseId);
+        validExpense(savedExpense);
         groupService.addExpenseToGroup(savedExpense, groupId);
         return savedExpense;
+    }
+    public Expense saveExpense(Expense expense){
+        return expenseRepository.save(expense);
+    }
+
+    private void validExpense(Expense expense){
+        if(expense == null){
+            throw new InvalidExpenseIdException("Expense ID does not exist");
+        }
     }
 }

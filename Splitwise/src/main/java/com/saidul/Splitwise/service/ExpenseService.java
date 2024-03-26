@@ -8,4 +8,5 @@ public interface ExpenseService {
     Expense addExpense(String description, double amount, Currency currency, int addedBy);
     Expense getExpenseById(int expenseId);
     Expense addExpenseToGroup(int expenseId, int groupId);
+    Expense saveExpense(Expense expense);
 }

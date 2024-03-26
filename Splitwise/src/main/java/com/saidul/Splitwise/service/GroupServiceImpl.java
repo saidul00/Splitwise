@@ -2,10 +2,8 @@ package com.saidul.Splitwise.service;
 
 import com.saidul.Splitwise.Exception.InvalidExpenseIdException;
 import com.saidul.Splitwise.Exception.InvalidGroupIdException;
-import com.saidul.Splitwise.entity.Expense;
-import com.saidul.Splitwise.entity.Group;
-import com.saidul.Splitwise.entity.SettlementTransaction;
-import com.saidul.Splitwise.entity.User;
+import com.saidul.Splitwise.entity.*;
+import com.saidul.Splitwise.entity.constant.UserExpenseType;
 import com.saidul.Splitwise.repository.GroupRepository;
 import org.hibernate.type.descriptor.java.CurrencyJavaType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +19,8 @@ public class GroupServiceImpl implements GroupService{
     private GroupRepository groupRepository;
     @Autowired
     private UserService userService;
+    @Autowired
+    private UserExpenseService userExpenseService;
 
     @Override
     public Group getGroupById(int groupId) {
@@ -62,13 +62,39 @@ public class GroupServiceImpl implements GroupService{
             savedGroup.setExpenses(new ArrayList<>());
         }
         savedGroup.getExpenses().add(expense);
-        if(expense.getCurrency().getCurrencyCode().equals("INR")){
-            savedGroup.setTotalAmountSpent(savedGroup.getTotalAmountSpent() + expense.getAmount());
-        }else{
-            savedGroup.setTotalAmountSpent(savedGroup.getTotalAmountSpent() + CurrencyConverter.convertToINR(expense
+
+        savedGroup.setTotalAmountSpent(savedGroup.getTotalAmountSpent() + CurrencyConverter.convertToINR(expense
                     .getCurrency(), expense.getAmount()));
+        return groupRepository.save(savedGroup);
+    }
+
+    @Override
+    public Group splitExpense(int groupId) {
+        Group savedGroup = groupRepository.findGroupById(groupId);
+        if(savedGroup.getExpenses() != null){
+            for(Expense expense : savedGroup.getExpenses()){
+                List<UserExpense> userExpenses = split(expense, savedGroup.getMembers());
+                expense.setUserExpenses(userExpenses);
+            }
         }
         return groupRepository.save(savedGroup);
+    }
+    private List<UserExpense> split(Expense expense, List<User> members){
+        List<UserExpense> userExpenseList = new ArrayList<>();
+        for(User user : members){
+            UserExpense userExpense = new UserExpense();
+            double expenseAmount = CurrencyConverter.convertToINR(expense.getCurrency(), expense.getAmount());
+            userExpense.setUser(user);
+            if(expense.getAddedBy().equals(user)){
+                userExpense.setAmount(expenseAmount);
+                userExpense.setUserExpenseType(UserExpenseType.PAID);
+            }else{
+                userExpense.setAmount(expenseAmount/(members.size()-1));
+                userExpense.setUserExpenseType(UserExpenseType.HADTOPAY);
+            }
+            userExpenseList.add(userExpenseService.saveExpense(userExpense));
+        }
+        return userExpenseList;
     }
 
     @Override

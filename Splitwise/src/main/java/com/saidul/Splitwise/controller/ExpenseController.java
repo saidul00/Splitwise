@@ -49,6 +49,8 @@ public class ExpenseController {
         }
     }
     private void validateExpenseId(int expenseId){
-
+        if(expenseId < 1){
+            throw new InvalidExpenseIdException("Invalid expense Id");
+        }
     }
 }

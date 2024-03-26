@@ -42,6 +42,14 @@ public class EntityDTOMapper {
     public static GroupResponseDTO toGroupDTO(Group group){
         GroupResponseDTO groupResponseDTO = new GroupResponseDTO();
         groupResponseDTO.setGroupName(group.getName());
+        groupResponseDTO.setGroupMembers(new ArrayList<>());
+        for (User user : group.getMembers()){
+            groupResponseDTO.getGroupMembers().add(user.getName());
+        }
+        groupResponseDTO.setGroupExpense(new ArrayList<>());
+        for (Expense groupExpense : group.getExpenses()){
+            groupResponseDTO.getGroupExpense().add(EntityDTOMapper.toExpenseDTO(groupExpense));
+        }
         groupResponseDTO.setAmount(group.getTotalAmountSpent());
         return groupResponseDTO;
     }

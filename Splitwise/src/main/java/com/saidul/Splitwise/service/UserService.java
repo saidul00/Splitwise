@@ -1,5 +1,6 @@
 package com.saidul.Splitwise.service;
 
+import com.saidul.Splitwise.entity.Expense;
 import com.saidul.Splitwise.entity.User;
 
 public interface UserService {

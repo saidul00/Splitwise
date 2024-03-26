@@ -6,6 +6,8 @@ public abstract class CurrencyConverter {
     public static double convertToINR(Currency currency, double amount){
         double convertedAmount;
         switch (currency.getCurrencyCode()){
+            case "INR" :
+                convertedAmount = amount;
             case "USD" :
                 convertedAmount = amount*80;
                 break;
