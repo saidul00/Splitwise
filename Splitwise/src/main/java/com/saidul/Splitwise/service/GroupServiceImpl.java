@@ -5,6 +5,7 @@ import com.saidul.Splitwise.Exception.InvalidGroupIdException;
 import com.saidul.Splitwise.entity.*;
 import com.saidul.Splitwise.entity.constant.UserExpenseType;
 import com.saidul.Splitwise.repository.GroupRepository;
+import com.saidul.Splitwise.service.strategy.SettleUpStrategy;
 import org.hibernate.type.descriptor.java.CurrencyJavaType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,11 +25,8 @@ public class GroupServiceImpl implements GroupService{
 
     @Override
     public Group getGroupById(int groupId) {
-        Group savedGroup = groupRepository.findGroupById(groupId);
-        if(savedGroup == null){
-            throw new InvalidGroupIdException("Given group ID does not exist");
-        }
-        return savedGroup;
+        validateGroupId(groupId);
+        return groupRepository.findGroupById(groupId);
     }
 
     @Override
@@ -57,6 +55,7 @@ public class GroupServiceImpl implements GroupService{
 
     @Override
     public Group addExpenseToGroup(Expense expense, int groupId) {
+        validateGroupId(groupId);
         Group savedGroup = groupRepository.findGroupById(groupId);
         if(savedGroup.getExpenses() == null){
             savedGroup.setExpenses(new ArrayList<>());
@@ -96,8 +95,20 @@ public class GroupServiceImpl implements GroupService{
         return userExpenseList;
     }
 
+    private void validateGroupId(int groupId){
+        if(groupRepository.findGroupById(groupId) == null){
+            throw new InvalidGroupIdException("Given group ID does not exist");
+        }
+    }
+
+    @Autowired
+    private SettleUpStrategy settleUpStrategy;
+
     @Override
     public List<SettlementTransaction> settleUp(int groupId) {
-        return null;
+        validateGroupId(groupId);
+        Group savedGroup = groupRepository.findGroupById(groupId);
+        List<SettlementTransaction> transactions = settleUpStrategy.getSettlementTransactions(savedGroup.getExpenses());
+        return transactions;
     }
 }

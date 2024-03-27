@@ -10,6 +10,6 @@ import java.util.List;
 public class GroupResponseDTO {
     private String groupName;
     private List<String> groupMembers;
-    private double amount;
-    private List<ExpenseResponseDTO> groupExpense;
+    private double totalAmountSpent;
+    private List<ExpenseResponseDTO> listOfExpense;
 }

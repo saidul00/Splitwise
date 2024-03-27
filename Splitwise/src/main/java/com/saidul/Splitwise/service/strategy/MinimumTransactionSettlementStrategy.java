@@ -6,10 +6,16 @@ import com.saidul.Splitwise.entity.SettlementTransaction;
 import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.entity.UserExpense;
 import com.saidul.Splitwise.entity.constant.UserExpenseType;
+import com.saidul.Splitwise.repository.SettlementTransactionRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
+@Service
 
 public class MinimumTransactionSettlementStrategy implements SettleUpStrategy{
+    @Autowired
+    private SettlementTransactionRepository settlementTransactionRepository;
     @Override
     public List<SettlementTransaction> getSettlementTransactions(List<Expense> expenses) {
         HashMap<User,Double> outstandingBalance = getOutstandingBalances(expenses);
@@ -33,21 +39,23 @@ public class MinimumTransactionSettlementStrategy implements SettleUpStrategy{
             UserAmount borrower = minHeap.poll();
             UserAmount lender = maxHeap.poll();
 
-            assert lender != null;
             if(Math.abs(borrower.getAmount()) > lender.getAmount()){
                 borrower.setAmount(borrower.getAmount() + lender.getAmount());
                 minHeap.add(borrower);
                 SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), lender.getAmount());
                 settlementTransactions.add(settlementTransaction);
+                settlementTransactionRepository.save(settlementTransaction);
             } else if (Math.abs(borrower.getAmount()) < lender.getAmount()) {
                 lender.setAmount(lender.getAmount() + borrower.getAmount());
                 maxHeap.add(lender);
                 SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), Math.abs(borrower.getAmount()));
                 settlementTransactions.add(settlementTransaction);
+                settlementTransactionRepository.save(settlementTransaction);
             }else {
                 System.out.println(" Both Equal ");
                 SettlementTransaction settlementTransaction = new SettlementTransaction(borrower.getUser(), lender.getUser(), lender.getAmount());
                 settlementTransactions.add(settlementTransaction);
+                settlementTransactionRepository.save(settlementTransaction);
             }
         }
         return settlementTransactions;

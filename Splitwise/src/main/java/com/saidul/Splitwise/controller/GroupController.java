@@ -3,6 +3,7 @@ import com.saidul.Splitwise.Exception.InvalidGroupIdException;
 import com.saidul.Splitwise.Exception.InvalidGroupRequestData;
 import com.saidul.Splitwise.dto.CreateGroupRequestDTO;
 import com.saidul.Splitwise.entity.Group;
+import com.saidul.Splitwise.entity.SettlementTransaction;
 import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.mapper.EntityDTOMapper;
 import com.saidul.Splitwise.service.GroupService;
@@ -51,6 +52,15 @@ public class GroupController {
         groupService.splitExpense(groupId);
         return ResponseEntity.ok(
                 "done"
+        );
+    }
+
+    @GetMapping("/settle/groupID={groupId}")
+    public ResponseEntity settleUp(@PathVariable ("groupId") int groupId){
+        validateGroupReqId(groupId);
+        List<SettlementTransaction> settlementTransactions = groupService.settleUp(groupId);
+        return ResponseEntity.ok(
+                EntityDTOMapper.toSettlementTransactionResponseDTOList(settlementTransactions)
         );
     }
 

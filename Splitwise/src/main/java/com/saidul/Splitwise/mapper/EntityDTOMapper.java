@@ -1,10 +1,7 @@
 package com.saidul.Splitwise.mapper;
 
 import com.saidul.Splitwise.dto.*;
-import com.saidul.Splitwise.entity.Expense;
-import com.saidul.Splitwise.entity.Group;
-import com.saidul.Splitwise.entity.User;
-import com.saidul.Splitwise.entity.UserExpense;
+import com.saidul.Splitwise.entity.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,11 +43,11 @@ public class EntityDTOMapper {
         for (User user : group.getMembers()){
             groupResponseDTO.getGroupMembers().add(user.getName());
         }
-        groupResponseDTO.setGroupExpense(new ArrayList<>());
+        groupResponseDTO.setListOfExpense(new ArrayList<>());
         for (Expense groupExpense : group.getExpenses()){
-            groupResponseDTO.getGroupExpense().add(EntityDTOMapper.toExpenseDTO(groupExpense));
+            groupResponseDTO.getListOfExpense().add(EntityDTOMapper.toExpenseDTO(groupExpense));
         }
-        groupResponseDTO.setAmount(group.getTotalAmountSpent());
+        groupResponseDTO.setTotalAmountSpent(group.getTotalAmountSpent());
         return groupResponseDTO;
     }
     public static ExpenseResponseDTO toExpenseDTO(Expense expense){
@@ -75,5 +72,17 @@ public class EntityDTOMapper {
         userExpenseResponseDTO.setAmount(userExpense.getAmount());
         userExpenseResponseDTO.setType(userExpense.getUserExpenseType().toString());
         return userExpenseResponseDTO;
+    }
+    public static List<SettlementTransactionResponseDTO> toSettlementTransactionResponseDTOList(List<SettlementTransaction>
+                                                                                                settlementTransactionList){
+        List<SettlementTransactionResponseDTO> transactionResponseDTOS = new ArrayList<>();
+        for (SettlementTransaction settlementTransaction : settlementTransactionList){
+            SettlementTransactionResponseDTO transaction = new SettlementTransactionResponseDTO();
+            transaction.setBorrower(settlementTransaction.getBorrower().getName());
+            transaction.setLender(settlementTransaction.getLender().getName());
+            transaction.setAmount(settlementTransaction.getAmount());
+            transactionResponseDTOS.add(transaction);
+        }
+        return transactionResponseDTOS;
     }
 }
