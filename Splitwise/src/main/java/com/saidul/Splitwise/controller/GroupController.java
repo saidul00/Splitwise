@@ -31,7 +31,7 @@ public class GroupController {
                 EntityDTOMapper.toGroupDTO(savedGroup)
         );
     }
-    @GetMapping("/group/{id}")
+    @GetMapping("/group/ID={id}")
     public ResponseEntity getGroup(@PathVariable ("id") int groupId){
         validateGroupReqId(groupId);
         try {
@@ -45,7 +45,7 @@ public class GroupController {
     }
 
 
-    @PostMapping("/split/{groupId}")
+    @PostMapping("/split/ID={groupId}")
     public ResponseEntity splitGroupExpenses(@PathVariable ("groupId") int groupId){
         validateGroupReqId(groupId);
         groupService.splitExpense(groupId);

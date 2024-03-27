@@ -83,14 +83,13 @@ public class GroupServiceImpl implements GroupService{
         List<UserExpense> userExpenseList = new ArrayList<>();
         for(User user : members){
             UserExpense userExpense = new UserExpense();
-            double expenseAmount = CurrencyConverter.convertToINR(expense.getCurrency(), expense.getAmount());
+            double expenseAmountInINR = CurrencyConverter.convertToINR(expense.getCurrency(), expense.getAmount());
             userExpense.setUser(user);
+            userExpense.setAmount(expenseAmountInINR/(members.size()-1));
+            userExpense.setUserExpenseType(UserExpenseType.HADTOPAY);
             if(expense.getAddedBy().equals(user)){
-                userExpense.setAmount(expenseAmount);
+                userExpense.setAmount(expenseAmountInINR);
                 userExpense.setUserExpenseType(UserExpenseType.PAID);
-            }else{
-                userExpense.setAmount(expenseAmount/(members.size()-1));
-                userExpense.setUserExpenseType(UserExpenseType.HADTOPAY);
             }
             userExpenseList.add(userExpenseService.saveExpense(userExpense));
         }

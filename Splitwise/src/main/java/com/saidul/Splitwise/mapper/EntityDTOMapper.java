@@ -66,6 +66,7 @@ public class EntityDTOMapper {
                 members.add(toUserExpenseDTO(userExpense));
             }
         }
+        expenseResponseDTO.setMembers(members);
         return expenseResponseDTO;
     }
     public static UserExpenseResponseDTO toUserExpenseDTO(UserExpense userExpense){

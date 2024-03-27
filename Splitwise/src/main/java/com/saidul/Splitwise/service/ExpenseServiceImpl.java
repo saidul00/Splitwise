@@ -45,9 +45,6 @@ public class ExpenseServiceImpl implements ExpenseService{
         groupService.addExpenseToGroup(savedExpense, groupId);
         return savedExpense;
     }
-    public Expense saveExpense(Expense expense){
-        return expenseRepository.save(expense);
-    }
 
     private void validExpense(Expense expense){
         if(expense == null){

@@ -18,14 +18,19 @@ public class ExpenseController {
 
     @PostMapping("/addexpense")
     public ResponseEntity addExpense(@RequestBody AddExpenseRequestDTO expenseRequestDTO){
-        validateExpenseRequestDTO(expenseRequestDTO);
+        try {
+            validateExpenseRequestDTO(expenseRequestDTO);
+        }catch (InavlidExpenseDataException inavlidExpenseDataException){
+            return ResponseEntity.badRequest().body("Invalid data to create expense");
+        }
+
         Expense savedExpense = expenseService.addExpense(expenseRequestDTO.getDescription(), expenseRequestDTO.getAmount(),
                 expenseRequestDTO.getCurrency(), expenseRequestDTO.getAddedBy());
         return ResponseEntity.ok(
                 EntityDTOMapper.toExpenseDTO(savedExpense)
         );
     }
-    @GetMapping("/expense/{id}")
+    @GetMapping("/expense/ID={id}")
     public ResponseEntity getExpense(@PathVariable ("id") int expenseId){
         validateExpenseId(expenseId);
         try {

@@ -30,7 +30,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody UserLoginRequestDTO dto) throws Exception{
+    public ResponseEntity login(@RequestBody UserLoginRequestDTO dto) {
         try {
             validateUserLoginRequestDTO(dto);
         }catch (UserLoginInvalidDataException e){

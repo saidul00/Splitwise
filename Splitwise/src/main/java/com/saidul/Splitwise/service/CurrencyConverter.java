@@ -7,7 +7,8 @@ public abstract class CurrencyConverter {
         double convertedAmount;
         switch (currency.getCurrencyCode()){
             case "INR" :
-                convertedAmount = amount;
+                convertedAmount = amount;        //INR is default Currency so no need for conversion
+                break;
             case "USD" :
                 convertedAmount = amount*80;
                 break;
