@@ -8,6 +8,7 @@ import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.mapper.EntityDTOMapper;
 import com.saidul.Splitwise.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +24,12 @@ public class UserController {
         }catch (UserRegistrationInvalidDataException e){
             return ResponseEntity.badRequest().body("Invalid sign up data");
         }
-        User savedUser = userService.signUp(dto.getName(),dto.getEmail(),dto.getPassword());
+        User savedUser;
+        try {
+            savedUser = userService.signUp(dto.getName(),dto.getEmail(),dto.getPassword());
+        }catch (RegistrationException registrationException){
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
+        }
         return ResponseEntity.ok(
                 EntityDTOMapper.toDTO(savedUser)
         );

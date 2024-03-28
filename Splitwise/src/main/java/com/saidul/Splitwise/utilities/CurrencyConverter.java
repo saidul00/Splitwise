@@ -1,8 +1,10 @@
-package com.saidul.Splitwise.service;
+package com.saidul.Splitwise.utilities;
+
+import lombok.experimental.UtilityClass;
 
 import java.util.Currency;
-
-public abstract class CurrencyConverter {
+@UtilityClass
+public class CurrencyConverter {
     public static double convertToINR(Currency currency, double amount){
         double convertedAmount;
         switch (currency.getCurrencyCode()){

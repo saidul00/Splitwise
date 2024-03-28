@@ -1,17 +1,15 @@
 package com.saidul.Splitwise.service;
 
-import com.saidul.Splitwise.Exception.InvalidExpenseIdException;
 import com.saidul.Splitwise.Exception.InvalidGroupIdException;
 import com.saidul.Splitwise.entity.*;
 import com.saidul.Splitwise.entity.constant.UserExpenseType;
 import com.saidul.Splitwise.repository.GroupRepository;
 import com.saidul.Splitwise.service.strategy.SettleUpStrategy;
-import org.hibernate.type.descriptor.java.CurrencyJavaType;
+import com.saidul.Splitwise.utilities.CurrencyConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Currency;
 import java.util.List;
 
 @Service

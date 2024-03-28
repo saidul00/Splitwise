@@ -18,7 +18,7 @@ public class UserServiceImpl implements UserService{
     public User signUp(String name, String email, String password){
         User savedUser = userRepository.findUserByEmail(email);
         if(savedUser != null){
-            throw new RegistrationException("The email address you entered is already in use");
+            throw new RegistrationException("Email already in use");
         }
         User user = new User();
         user.setName(name);
