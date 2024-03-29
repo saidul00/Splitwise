@@ -14,4 +14,15 @@ public class UserLoginResponseDTO {
     private String email;
     private List<UserFriendResponseDTO> friendList;
     private List<GroupResponseDTO> groups;
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "\n    id=" + id +
+                "\n    name='" + name + '\'' +
+                "\n    email='" + email + '\'' +
+                "\n    friendList=" + (friendList != null && !friendList.isEmpty() ? friendList : "empty") +
+                "\n    groups=" + (groups != null && !groups.isEmpty() ? groups : "empty") +
+                "\n}";
+    }
 }

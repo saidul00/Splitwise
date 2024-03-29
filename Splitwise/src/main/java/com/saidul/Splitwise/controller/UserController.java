@@ -3,10 +3,12 @@ package com.saidul.Splitwise.controller;
 import com.saidul.Splitwise.Exception.*;
 import com.saidul.Splitwise.dto.AddFriendRequestDTO;
 import com.saidul.Splitwise.dto.UserLoginRequestDTO;
+import com.saidul.Splitwise.dto.UserLoginResponseDTO;
 import com.saidul.Splitwise.dto.UserSignUpRequestDTO;
 import com.saidul.Splitwise.entity.User;
 import com.saidul.Splitwise.mapper.EntityDTOMapper;
 import com.saidul.Splitwise.service.UserService;
+import com.saidul.Splitwise.utilities.EmailValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,7 +23,9 @@ public class UserController {
     public ResponseEntity signUp(@RequestBody UserSignUpRequestDTO dto){
         try {
             validateUserSignUpRequestDTO(dto);
-        }catch (UserRegistrationInvalidDataException e){
+        }catch (InvalidEmailException invalidEmailException){
+            return ResponseEntity.badRequest().body("Invalid email");
+        } catch (UserRegistrationInvalidDataException e){
             return ResponseEntity.badRequest().body("Invalid sign up data");
         }
         User savedUser;
@@ -30,8 +34,9 @@ public class UserController {
         }catch (RegistrationException registrationException){
             return ResponseEntity.status(HttpStatus.CONFLICT).body("Email already in use");
         }
+        UserLoginResponseDTO loginResponseDTO = EntityDTOMapper.toDTO(savedUser);
         return ResponseEntity.ok(
-                EntityDTOMapper.toDTO(savedUser)
+                "User registered successfully\n" + loginResponseDTO.toString()
         );
     }
 
@@ -67,13 +72,16 @@ public class UserController {
                     savedUser
             );
         }catch (InvalidEmailException invalidEmailException){
-            return ResponseEntity.badRequest().body("User with email not found");
+            return ResponseEntity.badRequest().body("Friend email not found");
         }catch (InvalidFriendRequestException friendRequestException){
             return ResponseEntity.badRequest().body("Adding the same friend multiple times is not allowed.");
         }
     }
 
     private void validateUserSignUpRequestDTO(UserSignUpRequestDTO signUpRequestDTO){
+        if(!EmailValidator.isValidEMail(signUpRequestDTO.getEmail())){
+            throw new InvalidEmailException("Invalid email");
+        }
         if(signUpRequestDTO.getEmail().isEmpty() || signUpRequestDTO.getName().isEmpty() || signUpRequestDTO.getPassword().isEmpty()){
             throw new UserRegistrationInvalidDataException("Invalid sign up data");
         }
